@@ -25,7 +25,7 @@ E = eye(n);
 for i = 1:n
     delta = E(:,i)*epsilon;
     numgrad(i) = (J(theta+delta)-J(theta-delta))/(epsilon*2.0);
-end
+end %11页最底下的公式
 
 
 

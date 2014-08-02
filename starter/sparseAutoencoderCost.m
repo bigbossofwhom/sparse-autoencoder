@@ -1,18 +1,18 @@
 function [cost,grad] = sparseAutoencoderCost(theta, visibleSize, hiddenSize, ...
                                              lambda, sparsityParam, beta, data)
 
-% visibleSize: the number of input units (probably 64) 
-% hiddenSize: the number of hidden units (probably 25) 
-% lambda: weight decay parameter
-% sparsityParam: The desired average activation for the hidden units (denoted in the lecture
+% visibleSize输入层个数: the number of input units (probably 64) 
+% hiddenSize隐藏层个数: the number of hidden units (probably 25) 
+% lambda权重衰减参数: weight decay parameter=0.0001
+% sparsityParam=0.01:稀疏性参数pdf14页，The desired average activation for the hidden units (denoted in the lecture
 %                           notes by the greek alphabet rho, which looks like a lower-case "p").
-% beta: weight of sparsity penalty term
-% data: Our 64x10000 matrix containing the training data.  So, data(:,i) is the i-th training example. 
+% beta=3: weight of sparsity penalty term
+% data（用的是patches里面的数据）: Our 64x10000 matrix containing the training data.  So, data(:,i) is the i-th training example. 
   
 % The input theta is a vector (because minFunc expects the parameters to be a vector). 
 % We first convert theta to the (W1, W2, b1, b2) matrix/vector format, so that this 
 % follows the notation convention of the lecture notes. 
-
+%把theta矩阵里面储存的权重项和偏离项提取出来给W1，W2，b1，b2
 W1 = reshape(theta(1:hiddenSize*visibleSize), hiddenSize, visibleSize);
 W2 = reshape(theta(hiddenSize*visibleSize+1:2*hiddenSize*visibleSize), visibleSize, hiddenSize);
 b1 = theta(2*hiddenSize*visibleSize+1:2*hiddenSize*visibleSize+hiddenSize);
@@ -29,34 +29,34 @@ b2grad = zeros(size(b2));
 %% ---------- YOUR CODE HERE --------------------------------------
 %  Instructions: Compute the cost/optimization objective J_sparse(W,b) for the Sparse Autoencoder,
 %                and the corresponding gradients W1grad, W2grad, b1grad, b2grad.
-%
+%通过反向传播方法计算总的损失函数，
 % W1grad, W2grad, b1grad and b2grad should be computed using backpropagation.
 % Note that W1grad has the same dimensions as W1, b1grad has the same dimensions
-% as b1, etc.  Your code should set W1grad to be the partial derivative of J_sparse(W,b) with
+% as b1, etc.  Your code should set W1grad to be the partial derivative（偏导数） of J_sparse(W,b) with
 % respect to W1.  I.e., W1grad(i,j) should be the partial derivative of J_sparse(W,b) 
 % with respect to the input parameter W1(i,j).  Thus, W1grad should be equal to the term 
-% [(1/m) \Delta W^{(1)} + \lambda W^{(1)}] in the last block of pseudo-code in Section 2.2 
+% [(1/m) \Delta W^{(1)} + \lambda W^{(1)}] （12页最上面的公式）in the last block of pseudo-code in Section 2.2 
 % of the lecture notes (and similarly for W2grad, b1grad, b2grad).
-% 
+% 第十页最上面的公式
 % Stated differently, if we were using batch gradient descent to optimize the parameters,
 % the gradient descent update to W1 would be W1 := W1 - alpha * W1grad, and similarly for W2, b1, b2. 
 % 
 
 % % Forward propagation
-% a1 = data;
-% a2 = sigmoid(W1*data + repmat(b1,1,size(data,2)));
+% a1 = data;    %a=f（z）；z= 。。。；a1、a2、a3分别表示第一、二、三层的输出值
+% a2 = sigmoid(W1*data + repmat(b1,1,size(data,2)));%W1为25*64，data为64*204，repmat为25*204的矩阵 
 % a3 = sigmoid(W2*a2 + repmat(b2,1,size(data,2)));
 % 
-% % Cost
+% % Cost 第六页PDF
 % J = ((1/size(data,2))*sum(sum(0.5*(a3 - data).^2))) + ((lambda/2)*(sum(sum(W1.^2)) + sum(sum(W2.^2))));
 % rho_approx = (1/size(data,2))*sum(a2,2);
 % % disp(rho_approx);
 % KL = sum(sparsityParam.*log(sparsityParam./rho_approx) + (1 - sparsityParam).*...
 %     log((1-sparsityParam)./(1-rho_approx)));
-% 
+% 15页的pdf
 % cost = J + (beta * KL);
 % 
-% del3 = -(data - a3).*(a3.*(1-a3));
+% del3 = -(data - a3).*(a3.*(1-a3));%表示第l层i单元对输出误差的度量
 % del2 = ((W2'*del3) + repmat(beta.*((-sparsityParam./rho_approx)+...
 %     ((1-sparsityParam)./(1-rho_approx))),1,size(data,2))).*(a2.*(1-a2));
 % 

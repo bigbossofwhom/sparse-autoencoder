@@ -1,18 +1,15 @@
 function [h, array] = display_network(A, opt_normalize, opt_graycolor, cols, opt_colmajor)
-% This function visualizes filters in matrix A. Each column of A is a
-% filter. We will reshape each column into a square image and visualizes
-% on each cell of the visualization panel. 
-% All other parameters are optional, usually you do not need to worry
+% This function visua u do not need to worry
 % about it.
 % opt_normalize: whether we need to normalize the filter so that all of
-% them can have similar contrast. Default value is true.
+% them can have similar contrast. Default value 默认值 is true.
 % opt_graycolor: whether we use gray as the heat map. Default is true.
-% cols: how many columns are there in the display. Default value is the
-% squareroot of the number of columns in A.
+% cols（有值，且值为8）: how many columns are there in the display. Default value is the
+% squareroot of the number of columns in A.列
 % opt_colmajor: you can switch convention to row major for A. In that
 % case, each row of A is a filter. Default value is false.
 warning off all
-
+%检查变量名opt_normalize中的变量是否存在
 if ~exist('opt_normalize', 'var') || isempty(opt_normalize)
     opt_normalize= true;
 end
@@ -27,7 +24,7 @@ end
 
 % rescale
 A = A - mean(A(:));
-
+%colormap(gray) 输出一个灰色系的曲面图
 if opt_graycolor, colormap(gray); end
 
 % compute rows, cols
@@ -37,8 +34,8 @@ buf=1;
 if ~exist('cols', 'var')
     if floor(sqrt(M))^2 ~= M
         n=ceil(sqrt(M));
-        while mod(M, n)~=0 && n<1.2*sqrt(M), n=n+1; end
-        m=ceil(M/n);
+        while mod(M, n)~=0 && n<1.2*sqrt(M), n=n+1; end %算出n=17；
+        m=ceil(M/n); %m为12
     else
         n=sqrt(M);
         m=n;
@@ -48,8 +45,8 @@ else
     m = ceil(M/n);
 end
 
-array=-ones(buf+m*(sz+buf),buf+n*(sz+buf));
-
+array=-ones(buf+m*(sz+buf),buf+n*(sz+buf));%109*154的矩阵
+%buf=1，m=12，n=17，sz=8；
 if ~opt_graycolor
     array = 0.1.* array;
 end
@@ -62,8 +59,8 @@ if ~opt_colmajor
             if k>M, 
                 continue; 
             end
-            clim=max(abs(A(:,k)));
-            if opt_normalize
+            clim=max(abs(A(:,k)));%选出A矩阵中第K列中最大值
+            if opt_normalize%把array矩阵赋值；
                 array(buf+(i-1)*(sz+buf)+(1:sz),buf+(j-1)*(sz+buf)+(1:sz))=reshape(A(:,k),sz,sz)/clim;
             else
                 array(buf+(i-1)*(sz+buf)+(1:sz),buf+(j-1)*(sz+buf)+(1:sz))=reshape(A(:,k),sz,sz)/max(abs(A(:)));
@@ -90,9 +87,11 @@ else
 end
 
 if opt_graycolor
-    h=imagesc(array,'EraseMode','none',[-1 1]);
+    h=imagesc(array,'EraseMode','none',[-1 1]);%系统自带的imagesc（）函数；
 else
     h=imagesc(array,'EraseMode','none',[-1 1]);
+    %将array中的数据线性映射到[-1,1]之间，然后使用当前设置的颜色表进行显示。
+    %此时的[-1,1]充满了整个颜色表。背景擦除模式设置为node，表示不擦除背景。
 end
 axis image off
 
