@@ -8,7 +8,7 @@ function numgrad = computeNumericalGradient(J, theta)
 numgrad = zeros(size(theta));
 
 %% ---------- YOUR CODE HERE --------------------------------------
-% Instructions: 
+% Instructions:   
 % Implement numerical gradient checking, and return the result in numgrad.  
 % (See Section 2.3 of the lecture notes.)
 % You should write code so that numgrad(i) is (the numerical approximation to) the 
@@ -25,7 +25,7 @@ E = eye(n);
 for i = 1:n
     delta = E(:,i)*epsilon;
     numgrad(i) = (J(theta+delta)-J(theta-delta))/(epsilon*2.0);
-end %11页最底下的公式
+end %11脪鲁脳卯碌脳脧脗碌脛鹿芦脢陆
 
 
 
